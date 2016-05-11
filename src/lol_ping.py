@@ -38,7 +38,7 @@ def ping(host):
     out, err = cmd.communicate()
 
     # Invalid host
-    if err is not '':
+    if err:
         return []
 
     else:
@@ -47,10 +47,32 @@ def ping(host):
                             r' \d+.\d+/(\d+.\d+)/(\d+.\d+)/\d+.\d+ (\w+)$')
         match = re.search(regexp, out)
 
-        return match.group(1, 2, 3) if match else []
+        return list(match.group(1, 2, 3)) if match else []
+
+
+def display_builder(data):
+    index = float(data[1])
+    region = '{region}:'.format(region=data[0].ljust(4))
+    average = '{average} {unit}'.format(average=data[1], unit=data[3])
+    maximum = '(max {maximum} {unit})'.format(maximum=data[2], unit=data[3])
+
+    return {index: index, region: region, average: average, maximum: maximum}
+
 
 if __name__ == '__main__':
+
     if system().lower() == 'darwin':
-        print(ping(SERVER['EUW']))
+
+        # For every region, calculates the ping and orders it speed.
+        ping_per_region = []
+        for region in SERVER:
+            ping_in_region = ping(SERVER[region])
+            str_format = display_builder([region] + ping_in_region)
+
+            ping_per_region.append((ping_in_region, str_format))
+
+        ping_per_region.sort(key=lambda x: float(x[1][1]))
+        print(ping_per_region)
+
     else:
         print(system().lower())
