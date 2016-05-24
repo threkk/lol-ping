@@ -3,9 +3,12 @@ TODO: Add docstring
 """
 from __future__ import print_function
 from __future__ import unicode_literals
+from __future__ import absolute_import
+from __future__ import division
+from platform import system
+
 import subprocess
 import re
-from platform import system
 
 # Extracted from
 # https://www.reddit.com/r/leagueoflegends/comments/4efy17/how_to_check_your_ping_without_getting_into_the/d20167p
@@ -14,7 +17,8 @@ SERVER = {
     'EUW': '104.160.141.3',
     'EUNE': '104.160.142.3',
     'OCE': '104.160.156.1',
-    'LAN': '104.160.136.3'
+    'LAN': '104.160.136.3',
+    '???': 'caca'
 }
 
 
@@ -50,14 +54,50 @@ def ping(host):
         return list(match.group(1, 2, 3)) if match else []
 
 
-def display_builder(data):
+def region_builder(data):
+
+    if len(data) == 1:
+        return {'index': -1, 'region': data[0].ljust(4), 'average': '',
+                'maximum': '', 'color': '|color=#444'}
+
     index = float(data[1])
     region = '{region}:'.format(region=data[0].ljust(4))
     average = '{average} {unit}'.format(average=data[1], unit=data[3])
     maximum = '(max {maximum} {unit})'.format(maximum=data[2], unit=data[3])
 
-    return {index: index, region: region, average: average, maximum: maximum}
+    if index < 100:
+        color = '|color=green'
+    elif index < 150:
+        color = '|color=yellow'
+    else:
+        color = '|color=red'
 
+    return {'index': index, 'region': region, 'average': average,
+            'maximum': maximum, 'color': color}
+
+
+def display(data):
+
+    average_max_len = max(list(map(lambda x: len(x['average']), data)))
+    maximum_max_len = max(list(map(lambda x: len(x['maximum']), data)))
+    
+    for item in data:
+
+        region = item['region']
+        color = item['color']
+
+        if item['index'] == -1:
+            row = '{region} is not reacheable at the moment.{clr}'.format(
+                    region=region, clr=color)
+
+        else:
+            average = item['average'].rjust(average_max_len)
+            maximum = item['maximum'].rjust(maximum_max_len)
+            row = '{region} {average} {maximum} {clr}'.format(region=region,
+                                                              average=average,
+                                                              maximum=maximum,
+                                                              clr=color)
+        print(row)
 
 if __name__ == '__main__':
 
@@ -67,12 +107,12 @@ if __name__ == '__main__':
         ping_per_region = []
         for region in SERVER:
             ping_in_region = ping(SERVER[region])
-            str_format = display_builder([region] + ping_in_region)
+            region_data = region_builder([region] + ping_in_region)
 
-            ping_per_region.append((ping_in_region, str_format))
+            ping_per_region.append(region_data)
 
-        ping_per_region.sort(key=lambda x: float(x[1][1]))
-        print(ping_per_region)
+        ping_per_region.sort(key=lambda x: (1/float(x['index'])), reverse=True)
+        display(ping_per_region)
 
     else:
         print(system().lower())
