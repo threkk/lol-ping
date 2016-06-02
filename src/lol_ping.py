@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """
 TODO: Add docstring
 """
@@ -8,6 +11,7 @@ from __future__ import division
 from platform import system
 
 import subprocess
+import sys
 import re
 
 # Extracted from
@@ -18,7 +22,6 @@ SERVER = {
     'EUNE': '104.160.142.3',
     'OCE': '104.160.156.1',
     'LAN': '104.160.136.3',
-    '???': 'caca'
 }
 
 
@@ -66,11 +69,11 @@ def region_builder(data):
     maximum = '(max {maximum} {unit})'.format(maximum=data[2], unit=data[3])
 
     if index < 100:
-        color = '|color=green'
+        color = '|color=#0A640C'  # Green
     elif index < 150:
-        color = '|color=yellow'
+        color = '|color=#FEC041'  # Yellow
     else:
-        color = '|color=red'
+        color = '|color=#FC645F'  # Red
 
     return {'index': index, 'region': region, 'average': average,
             'maximum': maximum, 'color': color}
@@ -80,7 +83,15 @@ def display(data):
 
     average_max_len = max(list(map(lambda x: len(x['average']), data)))
     maximum_max_len = max(list(map(lambda x: len(x['maximum']), data)))
-    
+
+    # Fixes an encoding issue with Bitbar. Usually this would not be needed
+    # due to the import of unicode literals from future.
+    if sys.version[0] == 3:
+        print('𝐋')
+    else:
+        print('𝐋'.encode('utf-8'))
+
+    print(u'---')
     for item in data:
 
         region = item['region']
@@ -88,16 +99,18 @@ def display(data):
 
         if item['index'] == -1:
             row = '{region} is not reacheable at the moment.{clr}'.format(
-                    region=region, clr=color)
+                   region=region, clr=color)
 
         else:
+            raw_row = '{region} {average} {maximum} {clr} font=Menlo'
+
             average = item['average'].rjust(average_max_len)
             maximum = item['maximum'].rjust(maximum_max_len)
-            row = '{region} {average} {maximum} {clr}'.format(region=region,
-                                                              average=average,
-                                                              maximum=maximum,
-                                                              clr=color)
+
+            row = raw_row.format(region=region, average=average,
+                                 maximum=maximum, clr=color)
         print(row)
+    print('Update now | color=#B8BABC refresh=true')
 
 if __name__ == '__main__':
 
