@@ -1,9 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""lol-ping main script.
+
+This script displays in sorted table the ping to the following League of
+Legends regions: Europe West (EUW), Europe North East (EUNE), Latin America
+(LAN) and Oceania (OCE). The script is intended to within Bitbar so it includes
+inside the strings its custom tags for improving the display. This scripts runs
+both on Python 2 and Python 3.
 """
-TODO: Add docstring
-"""
+
+# Assures compatibility in both Python 2 and Python 3.
 from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import absolute_import
@@ -58,10 +65,9 @@ def ping(host):
 
 
 def region_builder(data):
-
     if len(data) == 1:
         return {'index': -1, 'region': data[0].ljust(4), 'average': '',
-                'maximum': '', 'color': '|color=#444'}
+                'maximum': '', 'color': '| color=#444'}
 
     index = float(data[1])
     region = '{region}:'.format(region=data[0].ljust(4))
@@ -69,7 +75,7 @@ def region_builder(data):
     maximum = '(max {maximum} {unit})'.format(maximum=data[2], unit=data[3])
 
     if index < 100:
-        color = '|color=#0A640C'  # Green
+        color = '|color=#0A640C'  # Greeni
     elif index < 150:
         color = '|color=#FEC041'  # Yellow
     else:
@@ -98,19 +104,20 @@ def display(data):
         color = item['color']
 
         if item['index'] == -1:
-            row = '{region} is not reacheable at the moment.{clr}'.format(
-                   region=region, clr=color)
+            row = '{region} is not reacheable at the moment.{clr}'
+            row = row.format(region=region, clr=color)
 
         else:
-            raw_row = '{region} {average} {maximum} {clr} font=Menlo'
 
             average = item['average'].rjust(average_max_len)
             maximum = item['maximum'].rjust(maximum_max_len)
 
-            row = raw_row.format(region=region, average=average,
-                                 maximum=maximum, clr=color)
+            row = '{region} {average} {maximum} {clr} font=Menlo'
+            row = row.format(region=region, average=average, maximum=maximum,
+                             clr=color)
         print(row)
     print('Update now | color=#B8BABC refresh=true')
+
 
 if __name__ == '__main__':
 
