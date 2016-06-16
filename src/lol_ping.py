@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""lol-ping main script.
+"""
+lol-ping main script.
 
 This script displays in sorted table the ping to the following League of
 Legends regions: Europe West (EUW), Europe North East (EUNE), Latin America
@@ -65,12 +66,22 @@ def ping(host):
 
 
 def region_builder(data):
+    """
+    Takes an instance of a ping result and builds a dictionary ready to
+    display.
+
+    The ping result returns the raw results. This function returns a dictionary
+    with all the sections formatted.
+
+    :param data: dic Result of ping call.
+    :return dic Result of the ping ready to display.
+    """
     if len(data) == 1:
         return {'index': -1, 'region': data[0].ljust(4), 'average': '',
                 'maximum': '', 'color': '| color=#444'}
 
     index = float(data[1])
-    region = '{region}:'.format(region=data[0].ljust(4))
+    region_initials = '{region}:'.format(region=data[0].ljust(4))
     average = '{average} {unit}'.format(average=data[1], unit=data[3])
     maximum = '(max {maximum} {unit})'.format(maximum=data[2], unit=data[3])
 
@@ -81,12 +92,21 @@ def region_builder(data):
     else:
         color = '|color=#FC645F'  # Red
 
-    return {'index': index, 'region': region, 'average': average,
+    return {'index': index, 'region': region_initials, 'average': average,
             'maximum': maximum, 'color': color}
 
 
 def display(data):
+    """
+    Displays the interface.
 
+    Takes a list of dictionaries which contains the information from the ping
+    operations ready to display and prints them after appliying the proper
+    padding to align the blocks. It also adds the button on the navbar and the
+    reload.
+
+    :param data: list List with dictionaries of pings ready to display.
+    """
     average_max_len = max(list(map(lambda x: len(x['average']), data)))
     maximum_max_len = max(list(map(lambda x: len(x['maximum']), data)))
 
@@ -100,12 +120,12 @@ def display(data):
     print(u'---')
     for item in data:
 
-        region = item['region']
+        region_initials = item['region']
         color = item['color']
 
         if item['index'] == -1:
             row = '{region} is not reacheable at the moment.{clr}'
-            row = row.format(region=region, clr=color)
+            row = row.format(region=region_initials, clr=color)
 
         else:
 
@@ -113,10 +133,11 @@ def display(data):
             maximum = item['maximum'].rjust(maximum_max_len)
 
             row = '{region} {average} {maximum} {clr} font=Menlo'
-            row = row.format(region=region, average=average, maximum=maximum,
-                             clr=color)
+            row = row.format(region=region_initials, average=average,
+                             maximum=maximum, clr=color)
+
         print(row)
-    print('Update now | color=#B8BABC refresh=true')
+    print('Update now | color=#444 refresh=true')
 
 
 if __name__ == '__main__':
@@ -124,15 +145,15 @@ if __name__ == '__main__':
     if system().lower() == 'darwin':
 
         # For every region, calculates the ping and orders it speed.
-        ping_per_region = []
+        PINGS = []
         for region in SERVER:
-            ping_in_region = ping(SERVER[region])
-            region_data = region_builder([region] + ping_in_region)
+            region_ping = ping(SERVER[region])
+            region_data = region_builder([region] + region_ping)
 
-            ping_per_region.append(region_data)
+            PINGS.append(region_data)
 
-        ping_per_region.sort(key=lambda x: (1/float(x['index'])), reverse=True)
-        display(ping_per_region)
+        PINGS.sort(key=lambda x: (1/float(x['index'])), reverse=True)
+        display(PINGS)
 
     else:
         print(system().lower())
