@@ -107,9 +107,8 @@ def display(data):
 
     :param data: list List with dictionaries of pings ready to display.
     """
-    average_max_len = max(list(map(lambda x: len(x['average']), data)))
-    maximum_max_len = max(list(map(lambda x: len(x['maximum']), data)))
-
+    average_max_len = max([len(x['average']) for x in data])
+    maximum_max_len = max([len(x['maximum']) for x in data])
     # Fixes an encoding issue with Bitbar. Usually this would not be needed
     # due to the import of unicode literals from future.
     if sys.version[0] == 3:
