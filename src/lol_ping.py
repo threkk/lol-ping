@@ -30,10 +30,13 @@ SERVER = {
     'EUNE': '104.160.142.3',
     'OCE': '104.160.156.1',
     'LAN': '104.160.136.3',
+    # For testing purposes.
+    'INV': '0.0.0.0',
+    'LOC': '127.0.0.1'
 }
 
 
-def ping(host):
+def ping(reg):
     """
     Calls the native ping function of OS X to extract the average time, the
     maximum time and the unit of the connection to the given server.
@@ -41,6 +44,12 @@ def ping(host):
     :param host: str IP of the server.
     :return: dictionary average time, maximum time
     """
+
+    # If the region does not exist in our server list.
+    if reg not in SERVER:
+        return [reg]
+
+    host = SERVER[reg]
 
     # We call the native ping command from OS X.
     cmd = subprocess.Popen(
@@ -54,7 +63,7 @@ def ping(host):
 
     # Invalid host
     if err:
-        return []
+        return [reg]
 
     else:
         # Grabs the average, max and the unit
@@ -62,7 +71,7 @@ def ping(host):
                             r' \d+.\d+/(\d+.\d+)/(\d+.\d+)/\d+.\d+ (\w+)$')
         match = re.search(regexp, out)
 
-        return list(match.group(1, 2, 3)) if match else []
+        return [reg] + list(match.group(1, 2, 3)) if match else [reg]
 
 
 def region_builder(data):
@@ -86,7 +95,7 @@ def region_builder(data):
     maximum = '(max {maximum} {unit})'.format(maximum=data[2], unit=data[3])
 
     if index < 100:
-        color = '|color=#0A640C'  # Greeni
+        color = '|color=#0A640C'  # Green
     elif index < 150:
         color = '|color=#FEC041'  # Yellow
     else:
@@ -146,10 +155,9 @@ if __name__ == '__main__':
         # For every region, calculates the ping and orders it speed.
         PINGS = []
         for region in SERVER:
-            region_ping = ping(SERVER[region])
-            region_data = region_builder([region] + region_ping)
-
-            PINGS.append(region_data)
+            if region != 'LOC' and region != 'INV':
+                region_data = region_builder(ping(region))
+                PINGS.append(region_data)
 
         PINGS.sort(key=lambda x: (1/float(x['index'])), reverse=True)
         display(PINGS)
