@@ -26,7 +26,7 @@ class PingTest(unittest.TestCase):
         output = ping('LOC')
         self.assertTrue(output)
         self.assertEquals('LOC', output[0])
-        self.assertTrue(len(output) == 3)
+        self.assertTrue(len(output) == 4)
 
 if __name__ == '__main__':
     unittest.main()
