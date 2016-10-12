@@ -55,8 +55,7 @@ def ping(reg):
     cmd = subprocess.Popen(
         ['ping', '-c', '4', host],
         stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        universal_newlines=True
+        stderr=subprocess.PIPE
     )
 
     out, err = cmd.communicate()

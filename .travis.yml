@@ -4,6 +4,15 @@ python:
     - "3.5"
 script: python -m unittest discover
 addons:
-  apt:
-    packages:
-    - ping
+    apt:
+        packages:
+            - ping
+
+branches:
+    only: 
+        - master
+
+cache: false
+
+notifications:
+    email: false
