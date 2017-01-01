@@ -68,7 +68,7 @@ def ping(reg):
         # Grabs the average, max and the unit
         regexp = re.compile(r'round-trip min/avg/max/stddev ='
                             r' \d+.\d+/(\d+.\d+)/(\d+.\d+)/\d+.\d+ (\w+)$')
-        match = re.search(regexp, out)
+        match = re.search(regexp, out.decode('utf-8'))
 
         return [reg] + list(match.group(1, 2, 3)) if match else [reg]
 
