@@ -17,8 +17,8 @@ class PingTest(unittest.TestCase):
     def test_timeout(self):
         """ Tests if in case of time out, it returns false. """
         if environ.get('TRAVIS') == 'TRAVIS':
-            self.skipTest(r'Test skipped due to TRAVIS not being '
-                          r'able to call the ping command')
+            self.skipTest(u'Test skipped due to TRAVIS not being '
+                          u'able to call the ping command')
         else:
             output = ping('INV')
             self.assertEqual(output, ['INV'])
@@ -29,8 +29,8 @@ class PingTest(unittest.TestCase):
         with exactly 3 elements.
         """
         if environ.get('TRAVIS') == 'TRAVIS':
-            self.skipTest(r'Test skipped due to TRAVIS not being '
-                          r'able to call the ping command')
+            self.skipTest(u'Test skipped due to TRAVIS not being '
+                          u'able to call the ping command')
         else:
             output = ping('LOC')
             self.assertTrue(output)
