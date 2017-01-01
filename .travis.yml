@@ -1,18 +1,17 @@
 language: python
 python:
     - "2.7"
-    - "3.5"
+    - "3.6"
 script: python -m unittest discover
-addons:
-    apt:
-        packages:
-            - ping
 
 branches:
-    only: 
+    only:
         - master
 
 cache: false
 
 notifications:
     email: false
+
+env:
+    - TRAVIS=TRAVIS

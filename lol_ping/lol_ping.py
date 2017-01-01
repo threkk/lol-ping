@@ -132,7 +132,7 @@ def display(data):
 
         if item['index'] == -1:
             row = '{region} is not reacheable at the moment.{clr}'
-            row = row.format(region=region_initials, clr=color)
+            row = row.format(region=region_initials.strip(), clr=color)
 
         else:
 
